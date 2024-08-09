@@ -2,7 +2,7 @@
   <div class="cell">
     <input type="number" :id="cellData.id" :class="store.cell(cellData.id)?.class" @change="cellChanged"
            v-bind:value="store.cell(cellData.id)?.value === 0 ? ' ' : store.cell(cellData.id)?.value"
-           :tabindex="cellData.row*9+cellData.col" :readonly="store.lockedCellIds.includes(cellData.id)">
+           :tabindex="10+cellData.row*9+cellData.col" :readonly="store.lockedCellIds.includes(cellData.id)">
     <div class="possibles">
       {{ cellData.poss.join('') }}
     </div>
@@ -24,7 +24,11 @@ const cellChanged = (event: any) => {
   if (!cell) {
     return
   }
-  cell.value = event.target.value
+  let value = event.target.value
+  if (value < 1 || value > 9) {
+    value = 0
+  }
+  cell.value = value
   store.cellChanged(cell)
 }
 
@@ -35,7 +39,6 @@ const cellChanged = (event: any) => {
 .cell {
   height: 70px;
   width: 70px;
-  border: 1px solid #ccc;
   padding: 5px;
   text-align: center;
 }
@@ -43,7 +46,7 @@ const cellChanged = (event: any) => {
 .possibles {
   font-size: 8px;
   text-align: center;
-  padding-bottom: 10px;
+  padding-bottom: 20px;
 }
 
 /* Chrome, Safari, Edge, Opera */

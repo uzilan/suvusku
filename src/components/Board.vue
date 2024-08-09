@@ -1,14 +1,14 @@
 <template>
 
-  <div class="buttons">
-    <img class="sufusku" src="../assets/sufusku.png" alt="sufusku" />
-    &nbsp;
-    <CButton :disabled="store.locked()" color="primary" @click="store.lock()">Lock</CButton>
-    &nbsp;
-    <CButton color="primary" @click="reset()">Reset</CButton>
-  </div>
-
   <div class="table-wrapper">
+
+    <div class="sufusku-header">
+      <img class="sufusku" src="../assets/sufusku.png" alt="sufusku" />
+      &nbsp;
+      <CButton :disabled="store.locked()" color="primary" @click="store.lock()">Lock</CButton>
+      &nbsp;
+      <CButton color="primary" @click="reset()">Reset</CButton>
+    </div>
     <CTable>
       <CTableBody>
         <template v-for="row in 3" v-bind:key="row">
@@ -64,21 +64,28 @@ const confirmReset = () => {
 <style scoped>
 
 img.sufusku {
-  width: 30vw;
-  padding-bottom: 30px;
+  width: 300px;
 }
 
-.buttons {
-  width: 80%;
+.sufusku-header {
+  width: 100%;
+  text-align: center;
   padding-bottom: 20px;
-  display: contents;
+  white-space: nowrap;
 }
 
 .table-wrapper {
   width: 40%;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
+
+  text-align: center;
+}
+
+@media only screen and (min-width: 1025px) {
+  .table-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 table {
@@ -89,5 +96,10 @@ table {
 
 td {
   padding: 0 15px 0 0;
+  border-width: 0;
+}
+
+tr {
+  border-width: 0;
 }
 </style>

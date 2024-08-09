@@ -27,7 +27,13 @@ const props = defineProps<{
 
 
 <style scoped>
+
 td {
   padding: 0;
+  border-width: 0;
+}
+
+tr {
+  border-width: 0;
 }
 </style>

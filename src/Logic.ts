@@ -12,7 +12,10 @@ export const updateCells = (cells: CellData[], lockedCellIds: string[], updated:
 
   const avails = (cellData: CellData): number[] => {
     const all = [...Array(10).keys()].slice(1)
-    const used = new Set([...sus(cellData)].map(cell => cell.value))
+    const used = new Set([...sus(cellData)]
+      .map(cell => Number(cell.value))
+      .filter(value => value !== 0))
+
     return all.filter(value => !used.has(value))
   }
 

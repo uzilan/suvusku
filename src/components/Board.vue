@@ -8,36 +8,21 @@
     <CButton color="primary" @click="reset()">Reset</CButton>
   </div>
 
-  <CContainer>
-    <CRow class="align-items-start">
-      <CCol xs="10">
-        <div class="table-wrapper">
-          <CTable>
-            <CTableBody>
-              <template v-for="row in 3" v-bind:key="row">
-                <CTableRow>
-                  <template v-for="col in 3" v-bind:key="store.cells[(row-1)*3+col-1].id">
-                    <CTableDataCell>
-                      <Section class="cell" :sectionCells="store.sections[(row-1)*3+col-1]" />
-                    </CTableDataCell>
-                  </template>
-                </CTableRow>
-              </template>
-            </CTableBody>
-          </CTable>
-        </div>
-      </CCol>
-      <CCol xs="2">
-        <div v-if="store.locked()" class="log-button-wrapper">
-          <CButton color="primary" @click="logVisible = !logVisible">{{ logVisible ? 'Hide log' : 'Show log' }}
-          </CButton>
-        </div>
-        <CCollapse :visible="logVisible">
-          <Log />
-        </CCollapse>
-      </CCol>
-    </CRow>
-  </CContainer>
+  <div class="table-wrapper">
+    <CTable>
+      <CTableBody>
+        <template v-for="row in 3" v-bind:key="row">
+          <CTableRow>
+            <template v-for="col in 3" v-bind:key="store.cells[(row-1)*3+col-1].id">
+              <CTableDataCell>
+                <Section class="cell" :sectionCells="store.sections[(row-1)*3+col-1]" />
+              </CTableDataCell>
+            </template>
+          </CTableRow>
+        </template>
+      </CTableBody>
+    </CTable>
+  </div>
 
   <CModal :backdrop="false" :keyboard="false" :visible="showReset">
     <CModalHeader>
@@ -57,14 +42,10 @@ import { ref } from 'vue'
 import Section from '@/components/Section.vue'
 import { CTable, CTableBody, CTableDataCell, CTableRow } from '@coreui/vue/dist/esm/components/table'
 import { useCellDataStore } from '@/components/CellDataStore'
-import { CCol, CContainer, CRow } from '@coreui/vue/dist/esm/components/grid'
-import Log from '@/components/Log.vue'
-import { CCollapse } from '@coreui/vue/dist/esm/components/collapse'
 import { CButton } from '@coreui/vue/dist/esm/components/button'
 import { CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/vue/dist/esm/components/modal'
 
 const store = useCellDataStore()
-const logVisible = ref<boolean>(true)
 const showReset = ref<boolean>(false)
 
 store.reset()
@@ -91,10 +72,6 @@ img.sufusku {
   width: 80%;
   padding-bottom: 20px;
   display: contents;
-}
-
-.log-button-wrapper {
-  text-align: left;
 }
 
 .table-wrapper {

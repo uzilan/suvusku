@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 import { DateTime } from 'luxon'
-import type { LogItem } from '@/model/LogItem'
 import { updateCells } from '@/Logic'
 import { groupBy } from '@/Utils'
 import { CellData } from '@/model/CellData'
@@ -11,8 +10,6 @@ export const useCellDataStore = defineStore('cellDataStore', {
   state: () => ({
     cells: ref<CellData[]>([]),
     sections: ref<any[]>([]),
-    log: ref<LogItem[]>([]),
-    currentLogItem: ref<LogItem>(),
     lockedCellIds: ref<string[]>([])
   }),
   actions: {
@@ -21,15 +18,6 @@ export const useCellDataStore = defineStore('cellDataStore', {
     },
     cellChanged: function(updated: CellData) {
       updateCells(this.cells, this.lockedCellIds, updated)
-      const logItem = ({
-        timestamp: DateTime.now(),
-        state: [...this.cells].map(cell => ({ ...cell })),
-        cellId: updated.id
-      })
-      if (this.locked()) {
-        this.log.push(logItem)
-        this.currentLogItem = logItem
-      }
     },
     lock: function() {
       this.lockedCellIds = this.cells
@@ -49,14 +37,8 @@ export const useCellDataStore = defineStore('cellDataStore', {
           this.cells.push(cellData)
         }
       }
-      this.log = []
 
       this.sections = groupBy(this.cells, 'section')
-    },
-    changeState: function(logItem: LogItem) {
-      this.currentLogItem = logItem
-      // this.cells = [...logItem.state]
-      updateCells(this.cells, this.lockedCellIds)
     }
   }
 })

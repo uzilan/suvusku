@@ -1,8 +1,10 @@
 <template>
   <div class="cell">
-    <input type="number" :id="cellData.id" :class="cellData.class" @keyup="checkClass()" v-model="value">
+    <input type="number" :id="cellData.id" :class="store.cell(cellData.id)?.class" @change="cellChanged"
+           v-bind:value="store.cell(cellData.id)?.value === 0 ? ' ' : store.cell(cellData.id)?.value"
+           :tabindex="cellData.row*9+cellData.col" :readonly="store.lockedCellIds.includes(cellData.id)">
     <div class="possibles">
-      {{cellData.poss.join('')}}
+      {{ cellData.poss.join('') }}
     </div>
   </div>
 </template>
@@ -10,45 +12,25 @@
 <script setup lang="ts">
 import type { CellData } from '@/model/CellData'
 import { useCellDataStore } from '@/components/CellDataStore'
-import { ref } from 'vue'
 
 const props = defineProps<{
   cellData: CellData
 }>()
 
 const store = useCellDataStore()
-const value = ref<number>()
 
-const checkClass = () => {
-  const cell = store.cells.find(cell => cell.id === props.cellData.id)
+const cellChanged = (event: any) => {
+  const cell = store.cell(props.cellData.id)
   if (!cell) {
     return
   }
-
-  cell.value = value.value
-  store.cellChanged()
+  cell.value = event.target.value
+  store.cellChanged(cell)
 }
 
 </script>
 
 <style scoped>
-
-
-.white {
-  background-color: #fff;
-}
-
-.red {
-  background-color: #f00;
-}
-
-.green {
-  background-color: #0f0;
-}
-
-.blue {
-  background-color: #00f;
-}
 
 .cell {
   height: 70px;

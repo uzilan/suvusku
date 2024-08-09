@@ -1,33 +1,62 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { CellData } from '@/model/CellData'
+
+import { DateTime } from 'luxon'
+import type { LogItem } from '@/model/LogItem'
+import { updateCells } from '@/Logic'
+import { groupBy } from '@/Utils'
+import { CellData } from '@/model/CellData'
 
 export const useCellDataStore = defineStore('cellDataStore', {
   state: () => ({
-    cells: ref<CellData[]>([])
+    cells: ref<CellData[]>([]),
+    sections: ref<any[]>([]),
+    log: ref<LogItem[]>([]),
+    currentLogItem: ref<LogItem>(),
+    lockedCellIds: ref<string[]>([])
   }),
   actions: {
-    cellChanged: function() {
-      const row = (rowIndex: number) => this.cells.filter(cell => cell.row === rowIndex)
-      const col = (colIndex: number) => this.cells.filter(cell => cell.col === colIndex)
-      const section = (sectionIndex: number) => this.cells.filter(cell => cell.section === sectionIndex)
-      const sus = (cellData: CellData) => new Set(row(cellData.row).concat(col(cellData.col)).concat(section(cellData.section)))
-      const dups = (cellData: CellData) => {
-        const same = [...sus(cellData)].filter(c => c.value === cellData.value)
-        return same?.length > 1
-      }
-
-      const avails = (cellData: CellData): number[] => {
-        const all = [...Array(10).keys()].slice(1)
-        const used = new Set([...sus(cellData)].map(cell => cell.value))
-        return all.filter(value => !used.has(value))
-      }
-
-      this.cells.forEach(cell => {
-        const d = dups(cell)
-        cell.class = !cell.value ? 'white' : d ? 'red' : 'green'
-        cell.poss = avails(cell)
+    cell: function(id: string) {
+      return this.cells.find(cell => cell.id === id)
+    },
+    cellChanged: function(updated: CellData) {
+      updateCells(this.cells, this.lockedCellIds, updated)
+      const logItem = ({
+        timestamp: DateTime.now(),
+        state: [...this.cells].map(cell => ({ ...cell })),
+        cellId: updated.id
       })
+      if (this.locked()) {
+        this.log.push(logItem)
+        this.currentLogItem = logItem
+      }
+    },
+    lock: function() {
+      this.lockedCellIds = this.cells
+        .filter(cell => cell.value)
+        .map(cell => cell.id)
+      updateCells(this.cells, this.lockedCellIds)
+    },
+    locked: function() {
+      return this.lockedCellIds.length > 0
+    },
+    reset: function() {
+      this.cells = []
+      this.lockedCellIds = []
+      for (let rowIndex = 0; rowIndex < 9; rowIndex++) {
+        for (let colIndex = 0; colIndex < 9; colIndex++) {
+          const cellData = new CellData(0, rowIndex, colIndex)
+          this.cells.push(cellData)
+        }
+      }
+      this.log = []
+
+      this.sections = groupBy(this.cells, 'section')
+    },
+    changeState: function(logItem: LogItem) {
+      this.currentLogItem = logItem
+      // this.cells = [...logItem.state]
+      updateCells(this.cells, this.lockedCellIds)
     }
   }
 })

@@ -7,3 +7,23 @@
     font-weight: normal;
     text-align: center;
 }
+
+.white {
+    background-color: #fff !important;
+}
+
+.red {
+    background-color: #f00 !important;
+}
+
+.green {
+    background-color: #0f0 !important;
+}
+
+.blue {
+    background-color: #0090ff !important;
+}
+
+.locked {
+    background-color: #999999 !important;
+}

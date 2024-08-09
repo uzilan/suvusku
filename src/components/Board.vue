@@ -1,56 +1,100 @@
 <template>
-  <img class="sufusku" src="../assets/sufusku.png" alt="sufusku" />
-  <div class="table-wrapper">
-    <CTable>
-      <CTableBody>
-        <template v-for="row in 3" v-bind:key="row">
-          <CTableRow>
-            <template v-for="col in 3" v-bind:key="store.cells[(row-1)*3+col-1].id">
-              <CTableDataCell>
-                <Section class="cell" :sectionCells="sections[(row-1)*3+col-1]" @cellChanged="cellChanged" />
-              </CTableDataCell>
-            </template>
-          </CTableRow>
-        </template>
-      </CTableBody>
-    </CTable>
+
+  <div class="buttons">
+    <img class="sufusku" src="../assets/sufusku.png" alt="sufusku" />
+    &nbsp;
+    <CButton :disabled="store.locked()" color="primary" @click="store.lock()">Lock</CButton>
+    &nbsp;
+    <CButton color="primary" @click="reset()">Reset</CButton>
   </div>
+
+  <CContainer>
+    <CRow class="align-items-start">
+      <CCol xs="10">
+        <div class="table-wrapper">
+          <CTable>
+            <CTableBody>
+              <template v-for="row in 3" v-bind:key="row">
+                <CTableRow>
+                  <template v-for="col in 3" v-bind:key="store.cells[(row-1)*3+col-1].id">
+                    <CTableDataCell>
+                      <Section class="cell" :sectionCells="store.sections[(row-1)*3+col-1]" />
+                    </CTableDataCell>
+                  </template>
+                </CTableRow>
+              </template>
+            </CTableBody>
+          </CTable>
+        </div>
+      </CCol>
+      <CCol xs="2">
+        <div v-if="store.locked()" class="log-button-wrapper">
+          <CButton color="primary" @click="logVisible = !logVisible">{{ logVisible ? 'Hide log' : 'Show log' }}
+          </CButton>
+        </div>
+        <CCollapse :visible="logVisible">
+          <Log />
+        </CCollapse>
+      </CCol>
+    </CRow>
+  </CContainer>
+
+  <CModal :backdrop="false" :keyboard="false" :visible="showReset">
+    <CModalHeader>
+      <CModalTitle>Really?</CModalTitle>
+    </CModalHeader>
+    <CModalBody>Are you sure you want to reset the current game?</CModalBody>
+    <CModalFooter>
+      <CButton color="secondary" @click="showReset = false">Cancel</CButton>
+      <CButton color="primary" @click="confirmReset">Reset</CButton>
+    </CModalFooter>
+  </CModal>
+
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { CellData } from '@/model/CellData'
 import Section from '@/components/Section.vue'
 import { CTable, CTableBody, CTableDataCell, CTableRow } from '@coreui/vue/dist/esm/components/table'
 import { useCellDataStore } from '@/components/CellDataStore'
+import { CCol, CContainer, CRow } from '@coreui/vue/dist/esm/components/grid'
+import Log from '@/components/Log.vue'
+import { CCollapse } from '@coreui/vue/dist/esm/components/collapse'
+import { CButton } from '@coreui/vue/dist/esm/components/button'
+import { CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/vue/dist/esm/components/modal'
 
 const store = useCellDataStore()
-const sections = ref<any[]>([])
+const logVisible = ref<boolean>(true)
+const showReset = ref<boolean>(false)
 
-const init = () => {
-  for (let rowIndex = 0; rowIndex < 9; rowIndex++) {
-    for (let colIndex = 0; colIndex < 9; colIndex++) {
-      const cellData = new CellData(0, rowIndex, colIndex)
-      store.cells.push(cellData)
-    }
-  }
+store.reset()
 
-  sections.value = Object.groupBy(store.cells, ({ section }) => section)
+const reset = () => {
+  showReset.value = true
 }
 
-const cellChanged = () => {
-
+const confirmReset = () => {
+  store.reset()
+  showReset.value = false
 }
-
-init()
 
 </script>
 
 <style scoped>
 
 img.sufusku {
-  width: 70vh;
+  width: 30vw;
+  padding-bottom: 30px;
+}
+
+.buttons {
+  width: 80%;
   padding-bottom: 20px;
+  display: contents;
+}
+
+.log-button-wrapper {
+  text-align: left;
 }
 
 .table-wrapper {

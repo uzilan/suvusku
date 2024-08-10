@@ -24,6 +24,10 @@
     </CTable>
   </div>
 
+  <div class="instructions">
+    <a href="#" @click="showInstructions = true">Instructions</a>
+  </div>
+
   <CModal :backdrop="false" :keyboard="false" :visible="showReset">
     <CModalHeader>
       <CModalTitle>Really?</CModalTitle>
@@ -33,6 +37,37 @@
       <CButton color="secondary" @click="showReset = false">Cancel</CButton>
       <CButton color="primary" @click="confirmReset">Reset</CButton>
     </CModalFooter>
+  </CModal>
+
+  <CModal size="xl" alignment="center" :backdrop="true" :keyboard="false" :visible="showInstructions"
+          @close="showInstructions = false">
+    <CModalHeader>
+      <CModalTitle>Instructions</CModalTitle>
+    </CModalHeader>
+    <CModalBody>
+      <ol>
+        <li>
+          <div>Add the original numbers and click on the lock button. That would set the baseline of your sudoku.</div>
+          <img src="../assets/locked.png" alt="locked board" class="instructions-img" />
+        </li>
+        <li>
+          <div>Start adding missing numbers. The numbers beneath each cell tells you which values are available.</div>
+          <img src="../assets/available.png" alt="available values" class="instructions-img" />
+        </li>
+        <li>Pay attention to the cell colors:
+          <ol class="secondary">
+            <li>A locked cell which cannot be changed <img src="../assets/locked-cell.png" alt="locked cell"
+                                                           class="instructions-single-img" /></li>
+            <li>A cells with a legal value <img src="../assets/filled-cell.png" alt="locked cell"
+                                                class="instructions-single-img" /></li>
+            <li>A cell with a single available value <img src="../assets/single-cell.png" alt="locked cell"
+                                                          class="instructions-single-img" /></li>
+            <li>Two cells with the same value <img src="../assets/dup-cells.png" alt="locked cell"
+                                                   class="instructions-double-img" /></li>
+          </ol>
+        </li>
+      </ol>
+    </CModalBody>
   </CModal>
 
 </template>
@@ -47,6 +82,7 @@ import { CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@co
 
 const store = useCellDataStore()
 const showReset = ref<boolean>(false)
+const showInstructions = ref<boolean>(false)
 
 store.reset()
 
@@ -101,5 +137,36 @@ td {
 
 tr {
   border-width: 0;
+}
+
+.instructions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding-right: 20px;
+}
+
+img.instructions-img {
+  width: 200px;
+  padding-top: 10px;
+}
+
+img.instructions-single-img {
+  width: 50px;
+  padding-top: 10px;
+}
+
+img.instructions-double-img {
+  width: 100px;
+  padding-top: 10px;
+}
+
+li {
+  padding-top: 10px;
+  text-align: left;
+}
+
+ol.secondary {
+  list-style-type: lower-alpha;
 }
 </style>
